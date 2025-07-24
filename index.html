@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>คำนวณราคาแพ็กเกจ Elephant Hills</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h2>คำนวณราคาแพ็กเกจ Elephant Hills</h2>
+
+  <label for="package">เลือกแพ็กเกจ:</label>
+  <select id="package">
+    <option value="EH-JS2">EH-JS2</option>
+    <option value="EH-JS3">EH-JS3</option>
+    <option value="EH-JS4">EH-JS4</option>
+    <option value="EH-JLS3">EH-JLS3</option>
+    <option value="EH-JLS4">EH-JLS4</option>
+  </select>
+
+  <label for="month">เลือกเดือน:</label>
+  <select id="month">
+    <option value="Jan">มกราคม</option>
+    <option value="Feb">กุมภาพันธ์</option>
+    <option value="Mar">มีนาคม</option>
+    <option value="Apr">เมษายน</option>
+    <option value="May">พฤษภาคม</option>
+    <option value="Jun">มิถุนายน</option>
+    <option value="Jul">กรกฎาคม</option>
+    <option value="Aug">สิงหาคม</option>
+    <option value="Sep">กันยายน</option>
+    <option value="Oct">ตุลาคม</option>
+    <option value="Nov">พฤศจิกายน</option>
+    <option value="Dec">ธันวาคม</option>
+  </select>
+
+  <label for="year">เลือกปี:</label>
+  <select id="year">
+    <option value="2024">2024</option>
+    <option value="2025">2025</option>
+    <option value="2026">2026</option>
+  </select>
+
+  <label for="adults">จำนวนผู้ใหญ่:</label>
+  <input type="number" id="adults" min="1" value="2">
+
+  <label for="children">จำนวนเด็ก:</label>
+  <input type="number" id="children" min="0" value="0">
+
+  <button onclick="calculatePrice()">คำนวณราคา</button>
+
+  <div id="result"></div>
+
+  <script>
+    const monthOrder = {
+      Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6,
+      Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12
+    };
+
+    const packageNights = {
+      "EH-JS2": 1,
+      "EH-JS3": 2,
+      "EH-JS4": 3,
+      "EH-JLS3": 2,
+      "EH-JLS4": 3
+    };
+
+    const packagePrices = {
+      high: {
+        "2024": {
+          "EH-JS2": { adult: 17350, child: 4338 },
+          "EH-JS3": { adult: 22900, child: 5725 },
+          "EH-JS4": { adult: 28500, child: 7125 },
+          "EH-JLS3": { adult: 26900, child: 6725 },
+          "EH-JLS4": { adult: 36000, child: 9000 }
+        },
+        "2025": {
+          "EH-JS2": { adult: 17350, child: 4338 },
+          "EH-JS3": { adult: 22900, child: 5725 },
+          "EH-JS4": { adult: 28500, child: 7125 },
+          "EH-JLS3": { adult: 26900, child: 6725 },
+          "EH-JLS4": { adult: 36000, child: 9000 }
+        },
+        "2026": {
+          "EH-JS2": { adult: 18220, child: 4555 },
+          "EH-JS3": { adult: 24045, child: 6011 },
+          "EH-JS4": { adult: 29925, child: 7481 },
+          "EH-JLS3": { adult: 28790, child: 7198 },
+          "EH-JLS4": { adult: 38520, child: 9630 }
+        }
+      },
+      low: {
+        "2025": {
+          "EH-JS2": { adult: 14600, child: 1825 },
+          "EH-JS3": { adult: 21500, child: 2688 },
+          "EH-JS4": { adult: 27100, child: 3388 },
+          "EH-JLS3": { adult: 25700, child: 3213 },
+          "EH-JLS4": { adult: 34000, child: 4250 }
+        },
+        "2026": {
+          "EH-JS2": { adult: 15330, child: 1916 },
+          "EH-JS3": { adult: 22575, child: 2822 },
+          "EH-JS4": { adult: 28455, child: 3557 },
+          "EH-JLS3": { adult: 27499, child: 3437 },
+          "EH-JLS4": { adult: 36380, child: 4548 }
+        }
+      }
+    };
+
+    function getSeason(pkg, month, year) {
+      const m = monthOrder[month];
+      const isJS = pkg.startsWith("EH-JS");
+      const isJLS = pkg.startsWith("EH-JLS");
+
+      if (year === "2024" && (m === 11 || m === 12)) return "high";
+      if (year === "2025") {
+        if (isJS && m >= 1 && m <= 4) return "high";
+        if (isJLS && ((m >= 1 && m <= 4) || m === 7 || m === 8)) return "high";
+        return "low";
+      }
+      if (year === "2026") {
+        if ((m >= 1 && m <= 4) || (isJLS && (m === 7 || m === 8))) return "high";
+        return "low";
+      }
+      return "low";
+    }
+
+    function isOnlineBookingPromo(month, year) {
+      const months = ["Sep", "Oct"];
+      const moreMonths = ["May", "Jun", "Sep", "Oct"];
+      return (year === "2025" && months.includes(month)) ||
+             (year === "2026" && moreMonths.includes(month));
+    }
+
+    function isFreeKidsPromo(month) {
+      return ["May", "Jun", "Sep"].includes(month);
+    }
+
+    function calculatePrice() {
+      const pkg = document.getElementById("package").value;
+      const month = document.getElementById("month").value;
+      const year = document.getElementById("year").value;
+      const adults = parseInt(document.getElementById("adults").value);
+      const children = parseInt(document.getElementById("children").value);
+
+      const season = getSeason(pkg, month, year);
+      const prices = packagePrices[season][year]?.[pkg];
+
+      if (!prices) {
+        document.getElementById("result").innerText = "ไม่มีข้อมูลราคาในช่วงที่เลือก";
+        return;
+      }
+
+      let adultPrice = prices.adult;
+      let childPrice = prices.child;
+      let promotions = [];
+
+      if (isOnlineBookingPromo(month, year)) {
+        adultPrice *= 0.9;
+        promotions.push("Online Booking & Agent -10%");
+      }
+
+      let childTotal = children * childPrice;
+      if (isFreeKidsPromo(month)) {
+        childTotal = 0;
+        if (children > 0) promotions.push("FREE KIDS");
+      }
+
+      const baseAdultTotal = adultPrice * adults;
+
+      let singleSup = 0;
+      if (adults === 1 && season === "high") {
+        const nights = packageNights[pkg] || 0;
+        singleSup = nights * 6500;
+      }
+
+      const total = baseAdultTotal + childTotal + singleSup;
+
+      document.getElementById("result").innerHTML = `
+        <strong>ผลลัพธ์:</strong><br>
+        แพ็กเกจ: ${pkg}<br>
+        เดือน: ${month} ${year}<br>
+        ฤดูกาล: ${season === 'high' ? 'High Season' : 'Low Season'}<br>
+        โปรโมชั่น: ${promotions.length > 0 ? promotions.join(", ") : "ไม่มี"}<br>
+        ผู้ใหญ่: ${adults} คน<br>
+        เด็ก: ${children} คน<br>
+        ${singleSup > 0 ? `Single Supplement: ${singleSup.toLocaleString()} บาท<br>` : ""}
+        <strong>ราคารวม: ${total.toLocaleString()} บาท</strong>
+      `;
+    }
+  </script>
+</body>
+</html>
